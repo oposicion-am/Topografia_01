@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Evaluación – Topografía y cálculo cartográfico</title>
+<style>
+  :root{--verde:#2f5d3a;--verde2:#4f8a5b;--claro:#eef4ef;--rojo:#b3261e;--ok:#1f7a3a;--txt:#1d2420;--gris:#6b736e;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6f4;color:var(--txt)}
+  header{background:var(--verde);color:#fff;padding:18px 20px;text-align:center}
+  header h1{margin:0;font-size:1.25rem;letter-spacing:.5px}
+  header p{margin:6px 0 0;font-size:.9rem;opacity:.85}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:.9rem;color:var(--gris)}
+  .progress{height:8px;background:#dfe6e0;border-radius:6px;overflow:hidden;margin-bottom:16px}
+  .progress div{height:100%;background:var(--verde2);width:0;transition:width .3s}
+  .card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:22px}
+  .meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--gris);margin-bottom:10px}
+  .tag{padding:2px 8px;border-radius:10px;font-weight:bold}
+  .Fácil{background:#e3f2e6;color:#1f6b32}.Medio{background:#fff3d6;color:#8a6200}.Alto{background:#fde2e0;color:#9b2a22}
+  .q{font-size:1.08rem;font-weight:bold;line-height:1.45;margin:0 0 16px}
+  .opt{display:block;width:100%;text-align:left;font:inherit;font-size:1rem;padding:12px 14px;margin:8px 0;border:2px solid #d5ddd7;border-radius:9px;background:#fff;cursor:pointer;transition:.15s}
+  .opt:hover:not(:disabled){border-color:var(--verde2);background:var(--claro)}
+  .opt b{display:inline-block;width:24px}
+  .opt.ok{border-color:var(--ok);background:#e6f4ea}
+  .opt.ko{border-color:var(--rojo);background:#fbe9e7}
+  .opt:disabled{cursor:default}
+  .exp{display:none;margin-top:14px;padding:12px 14px;border-left:4px solid var(--verde2);background:var(--claro);border-radius:6px;font-size:.95rem;line-height:1.45}
+  .exp.show{display:block}
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+  button.btn{font:inherit;padding:10px 18px;border-radius:8px;border:none;background:var(--verde);color:#fff;cursor:pointer;font-weight:bold}
+  button.btn:disabled{background:#b9c3bc;cursor:default}
+  button.sec{background:#fff;color:var(--verde);border:2px solid var(--verde)}
+  .dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:18px 0 0}
+  .dot{width:30px;height:30px;border-radius:50%;border:2px solid #cfd8d1;background:#fff;font-size:.75rem;cursor:pointer;color:var(--txt)}
+  .dot.cur{border-color:var(--verde);font-weight:bold}
+  .dot.ok{background:#cfe9d6;border-color:var(--ok)}
+  .dot.ko{background:#f6cfcb;border-color:var(--rojo)}
+  .result{text-align:center}
+  .result .big{font-size:3rem;font-weight:bold;color:var(--verde);margin:8px 0}
+  .result table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.9rem;text-align:left}
+  .result td,.result th{border-bottom:1px solid #e3e8e4;padding:6px}
+  .lockbtn{position:fixed;right:14px;bottom:14px;background:#fff;border:1px solid #cfd8d1;border-radius:20px;padding:7px 12px;font-size:.8rem;color:var(--gris);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:10}
+  .modal.show{display:flex}
+  .modal .box{background:#fff;border-radius:12px;padding:22px;width:min(340px,90vw)}
+  .modal input{width:100%;padding:10px;font:inherit;border:2px solid #cfd8d1;border-radius:8px;margin:10px 0}
+  .err{color:var(--rojo);font-size:.85rem;min-height:1.1em}
+  /* Versión Word / imprimir */
+  #printView{display:none;background:#fff;padding:28px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+  #doc{font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.35;color:#000}
+  #doc h2{font-size:11pt;font-weight:bold;text-align:center;margin:0 0 14pt}
+  #doc h3{font-size:11pt;font-weight:bold;margin:18pt 0 8pt}
+  #doc p{margin:0 0 0;font-size:11pt}
+  #doc .pq{margin:0 0 10pt;page-break-inside:avoid}
+  #doc .pq p.en{font-weight:bold;margin-bottom:3pt}
+  #doc .ans{margin-bottom:6pt}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  @media print{
+    body{background:#fff}
+    header,.wrap > :not(#printView),.lockbtn,.tools,.modal{display:none!important}
+    #printView{display:block!important;box-shadow:none;padding:0}
+    .wrap{max-width:none;padding:0}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>TEST DE EVALUACIÓN – TOPOGRAFÍA Y CÁLCULO CARTOGRÁFICO</h1>
+  <p>Escalas · Superficies · Pendientes y desniveles · Curvas de nivel · Coordenadas UTM y acimutes · Densidad de masas forestales</p>
+</header>
+
+<div class="wrap">
+  <div id="quiz">
+    <div class="bar"><span id="count"></span><span id="score"></span></div>
+    <div class="progress"><div id="prog"></div></div>
+    <div class="card" id="card"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="printView">
+    <div class="tools">
+      <button class="btn" onclick="copyDoc()">Copiar para Word</button>
+      <button class="btn sec" onclick="window.print()">Imprimir / PDF</button>
+      <button class="btn sec" onclick="closePrint()">Volver al test</button>
+      <span id="copied" style="align-self:center;color:var(--ok);font-size:.9rem"></span>
+    </div>
+    <div id="doc"></div>
+  </div>
+</div>
+
+<button class="lockbtn" onclick="openModal()">🔒 Versión docente</button>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <strong>Acceso a la versión Word / imprimir</strong>
+    <input type="password" id="pwd" placeholder="Contraseña" autocomplete="off">
+    <div class="err" id="err"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn sec" onclick="closeModal()">Cancelar</button>
+      <button class="btn" onclick="checkPwd()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const D = JSON.parse(decodeURIComponent(escape(atob("W3sicSI6IkVuIHVuIG1hcGEgYSBlc2NhbGEgMToxMC4wMDAgbWVkaW1vcyB1bmEgZGlzdGFuY2lhIGRlIDYgY20gZW50cmUgZG9zIGhpdG9zIGRlIGRlc2xpbmRlLiDCv0N1w6FsIGVzIGxhIGRpc3RhbmNpYSByZWFsPyIsIm8iOlsiNjAgbSIsIjYwMCBtIiwiMS4yMDAgbSIsIjYga20iXSwiYyI6MSwiZCI6IkbDoWNpbCIsInIiOiI2IGNtIMOXIDEwLjAwMCA9IDYwLjAwMCBjbSA9IDYwMCBtLiJ9LHsicSI6IkxhIGRpc3RhbmNpYSByZWFsIGVudHJlIGRvcyBwdW50b3MgZGUgYWd1YSBwYXJhIG1lZGlvcyBhw6lyZW9zIGVzIGRlIDMga20uIMK/Q3XDoW50byBtZWRpcsOhIGVuIHVuIG1hcGEgYSBlc2NhbGEgMToyNS4wMDA/IiwibyI6WyIxLDIgY20iLCI3LDUgY20iLCIxMjAgY20iLCIxMiBjbSJdLCJjIjozLCJkIjoiRsOhY2lsIiwiciI6IjMga20gPSAzMDAuMDAwIGNtOyAzMDAuMDAwIC8gMjUuMDAwID0gMTIgY20uIn0seyJxIjoiVW4gY29ydGFmdWVnb3MgZGUgMiw0IGttIGRlIGxvbmdpdHVkIHJlYWwgbWlkZSAxMiBjbSBlbiB1biBtYXBhLiDCv0N1w6FsIGVzIGxhIGVzY2FsYSBudW3DqXJpY2EgZGVsIG1hcGE/IiwibyI6WyIxOjIuMDAwIiwiMToyMDAuMDAwIiwiMToyMC4wMDAiLCIxOjI0LjAwMCJdLCJjIjoyLCJkIjoiTWVkaW8iLCJyIjoiMiw0IGttID0gMjQwLjAwMCBjbTsgMjQwLjAwMCAvIDEyID0gMjAuMDAwIOKGkiBlc2NhbGEgMToyMC4wMDAuIn0seyJxIjoiU29icmUgdW4gcGxhbm8gYSBlc2NhbGEgMToxMC4wMDAsIGVuIHRlcnJlbm8gbGxhbm8sIHVuYSBwYXJjZWxhIHJlY3Rhbmd1bGFyIG1pZGUgMyBjbSDDlyA1IGNtLiDCv0N1w6FsIGVzIHN1IHN1cGVyZmljaWUgcmVhbD8iLCJvIjpbIjEsNSBoYSIsIjE1MCBoYSIsIjE1IGhhIiwiMCwxNSBoYSJdLCJjIjoyLCJkIjoiTWVkaW8iLCJyIjoiMyBjbSDihpIgMzAwIG07IDUgY20g4oaSIDUwMCBtLiBTdXBlcmZpY2llID0gMzAwIMOXIDUwMCA9IDE1MC4wMDAgbcKyID0gMTUgaGEuIn0seyJxIjoiRW4gdW4gcGxhbm8gYSBlc2NhbGEgMToyLjAwMCB1bmEgc3VwZXJmaWNpZSBtaWRlIDI1IGNtwrIuIMK/Q3XDoWwgZXMgbGEgc3VwZXJmaWNpZSByZWFsPyIsIm8iOlsiMSBoYSIsIjEwIGhhIiwiMCwxIGhhIiwiMTAwIGhhIl0sImMiOjAsImQiOiJBbHRvIiwiciI6IkxhcyBzdXBlcmZpY2llcyBzZSByZWR1Y2VuIGNvbiBlbCBjdWFkcmFkbyBkZSBsYSBlc2NhbGE6IDI1IGNtwrIgw5cgMi4wMDDCsiA9IDEwMC4wMDAuMDAwIGNtwrIgPSAxMC4wMDAgbcKyID0gMSBoYS4ifSx7InEiOiJVbmEgbMOtbmVhIHJlY3RhIHBhc2EgcG9yIGxvcyBwdW50b3MgUDEoMSwzKSB5IFAyKDksOSkuIMK/Q3XDoWwgZXMgc3UgcGVuZGllbnRlPyIsIm8iOlsiNC8zIiwiNi8xMCIsIjEvMiIsIjMvNCJdLCJjIjozLCJkIjoiRsOhY2lsIiwiciI6Im0gPSAoeTIg4oiSIHkxKSAvICh4MiDiiJIgeDEpID0gKDkg4oiSIDMpIC8gKDkg4oiSIDEpID0gNi84ID0gMy80LiJ9LHsicSI6IlVuYSBwaXN0YSBmb3Jlc3RhbCB0aWVuZSB1bmEgcGVuZGllbnRlIGRlbCA4ICUgeSB1bmEgZGlzdGFuY2lhIGhvcml6b250YWwgcmVhbCBkZSAyLDUga20uIMK/Q3XDoWwgZXMgZWwgZGVzbml2ZWwgZW50cmUgZWwgaW5pY2lvIHkgZWwgZmluYWw/IiwibyI6WyIyMDAgbSIsIjIwIG0iLCIyNTAgbSIsIjMxMiw1IG0iXSwiYyI6MCwiZCI6IkbDoWNpbCIsInIiOiJEZXNuaXZlbCA9IHBlbmRpZW50ZSDDlyBkaXN0YW5jaWEgaG9yaXpvbnRhbCA9IDAsMDggw5cgMi41MDAgbSA9IDIwMCBtLiJ9LHsicSI6IkVudHJlIGRvcyBwdW50b3MgaGF5IHVuIGRlc25pdmVsIGRlIDQ1IG0geSB1bmEgZGlzdGFuY2lhIGhvcml6b250YWwgZGUgMzAwIG0uIMK/Q3XDoWwgZXMgbGEgcGVuZGllbnRlIGVuIHBvcmNlbnRhamU/IiwibyI6WyI2LDcgJSIsIjEsNSAlIiwiMTUgJSIsIjQ1ICUiXSwiYyI6MiwiZCI6IkbDoWNpbCIsInIiOiJQZW5kaWVudGUgPSAoNDUgLyAzMDApIMOXIDEwMCA9IDE1ICUuIn0seyJxIjoiRW4gdW4gbWFwYSAxOjUwLjAwMCwgZG9zIHB1bnRvcyBjb24gY290YXMgODIwIG0geSA5NDAgbSBlc3TDoW4gc2VwYXJhZG9zIDQgY20uIMK/Q3XDoWwgZXMgbGEgcGVuZGllbnRlIG1lZGlhIGVudHJlIGVsbG9zPyIsIm8iOlsiMyAlIiwiNiAlIiwiMTIgJSIsIjAsNiAlIl0sImMiOjEsImQiOiJNZWRpbyIsInIiOiJEaXN0YW5jaWEgaG9yaXpvbnRhbCA9IDQgw5cgNTAuMDAwID0gMjAwLjAwMCBjbSA9IDIuMDAwIG0uIERlc25pdmVsID0gMTIwIG0uIFBlbmRpZW50ZSA9IDEyMCAvIDIuMDAwIMOXIDEwMCA9IDYgJS4ifSx7InEiOiJVbmEgcGVuZGllbnRlIGRlbCAxMDAgJSBlcXVpdmFsZSBhIHVuIMOhbmd1bG8gZGU6IiwibyI6WyI5MMKwIiwiNjDCsCIsIjEwMMKwIiwiNDXCsCJdLCJjIjozLCJkIjoiTWVkaW8iLCJyIjoiMTAwICUgc2lnbmlmaWNhIGRlc25pdmVsIGlndWFsIGEgZGlzdGFuY2lhIGhvcml6b250YWw6IHRhbiDOsSA9IDEg4oaSIM6xID0gNDXCsC4ifSx7InEiOiJFbiB1biBtYXBhIDE6MjUuMDAwIGNvbiBlcXVpZGlzdGFuY2lhIGRlIDEwIG0sIGRvcyBjdXJ2YXMgZGUgbml2ZWwgY29uc2VjdXRpdmFzIGVzdMOhbiBzZXBhcmFkYXMgNSBtbS4gwr9DdcOhbCBlcyBsYSBwZW5kaWVudGUgZGVsIHRlcnJlbm8gZW50cmUgZWxsYXM/IiwibyI6WyI4ICUiLCIyICUiLCIxMiw1ICUiLCI4MCAlIl0sImMiOjAsImQiOiJNZWRpbyIsInIiOiIwLDUgY20gw5cgMjUuMDAwID0gMTIuNTAwIGNtID0gMTI1IG0gaG9yaXpvbnRhbGVzLiBQZW5kaWVudGUgPSAxMCAvIDEyNSDDlyAxMDAgPSA4ICUuIn0seyJxIjoiRW4gdW5hIHBhcmNlbGEgZGUgbXVlc3RyZW8gZGUgMjAwIG3CsiBzZSBpbnZlbnRhcsOtYW4gMTIgcGllcy4gwr9RdcOpIGVzcGVzdXJhIGNvcnJlc3BvbmRlPyIsIm8iOlsiNjAgcGllcy9oYSIsIjIuNDAwIHBpZXMvaGEiLCI2LjAwMCBwaWVzL2hhIiwiNjAwIHBpZXMvaGEiXSwiYyI6MywiZCI6IkbDoWNpbCIsInIiOiIxIGhhID0gMTAuMDAwIG3Csi4gMTIgw5cgKDEwLjAwMCAvIDIwMCkgPSAxMiDDlyA1MCA9IDYwMCBwaWVzL2hhLiJ9LHsicSI6IkVuIHVuYSBwYXJjZWxhIGRlIG11ZXN0cmVvIGNpcmN1bGFyIGRlIDEwIG0gZGUgcmFkaW8gc2UgY3VlbnRhbiAyMiBwaWVzLiDCv0N1w6FsIGVzIGxhIGRlbnNpZGFkIGFwcm94aW1hZGE/IiwibyI6WyIyMjAgcGllcy9oYSIsIjcwMCBwaWVzL2hhIiwiMi4yMDAgcGllcy9oYSIsIjcuMDAwIHBpZXMvaGEiXSwiYyI6MSwiZCI6IkFsdG8iLCJyIjoiU3VwZXJmaWNpZSA9IM+AIMOXIDEwwrIg4omIIDMxNCwxNiBtwrIuIDIyIMOXICgxMC4wMDAgLyAzMTQsMTYpIOKJiCA3MDAgcGllcy9oYS4ifSx7InEiOiJVbmEgcmVwb2JsYWNpw7NuIHNlIHJlYWxpemEgY29uIHVuIG1hcmNvIGRlIHBsYW50YWNpw7NuIHJlYWwgZGUgMyDDlyAzIG0uIMK/Q3XDoW50b3MgcGllcyBwb3IgaGVjdMOhcmVhIHNlIHBsYW50YW4gYXByb3hpbWFkYW1lbnRlPyIsIm8iOlsiOTAwIHBpZXMvaGEiLCIzMzMgcGllcy9oYSIsIjEuMTExIHBpZXMvaGEiLCIxLjY2NyBwaWVzL2hhIl0sImMiOjIsImQiOiJNZWRpbyIsInIiOiJDYWRhIHBpZSBvY3VwYSAzIMOXIDMgPSA5IG3Csi4gMTAuMDAwIC8gOSDiiYggMS4xMTEgcGllcy9oYS4ifSx7InEiOiJFbnRyZSBkb3MgcHVudG9zIGhheSB1bmEgZGlzdGFuY2lhIGhvcml6b250YWwgZGUgNDAwIG0geSB1biBkZXNuaXZlbCBkZSAzMDAgbS4gwr9DdcOhbCBlcyBsYSBkaXN0YW5jaWEgcmVhbCBtZWRpZGEgc29icmUgbGEgcGVuZGllbnRlIChkaXN0YW5jaWEgZ2VvbcOpdHJpY2EpPyIsIm8iOlsiNzAwIG0iLCIxMDAgbSIsIjM1MCBtIiwiNTAwIG0iXSwiYyI6MywiZCI6Ik1lZGlvIiwiciI6IlBvciBQaXTDoWdvcmFzOiDiiJooNDAwwrIgKyAzMDDCsikgPSDiiJoyNTAuMDAwID0gNTAwIG0uIn0seyJxIjoiRW4gdW4gbWFwYSBhIGVzY2FsYSAxOjUwLjAwMCwgwr9jdcOhbnRvIG1pZGUgZW4gZWwgcGFwZWwgdW4gc2VnbWVudG8gZGUgbGEgZXNjYWxhIGdyw6FmaWNhIHF1ZSByZXByZXNlbnRhIDEga20/IiwibyI6WyIyIGNtIiwiMCw1IGNtIiwiNSBjbSIsIjIwIGNtIl0sImMiOjAsImQiOiJGw6FjaWwiLCJyIjoiMSBrbSA9IDEwMC4wMDAgY207IDEwMC4wMDAgLyA1MC4wMDAgPSAyIGNtLiJ9LHsicSI6IkRvcyBwdW50b3MgdGllbmVuIGNvb3JkZW5hZGFzIFVUTSAobWlzbW8gaHVzbyk6IEEgKFggPSAyNzAuMDAwOyBZID0gNC41MDAuMDAwKSB5IEIgKFggPSAyNzMuMDAwOyBZID0gNC41MDQuMDAwKS4gwr9DdcOhbCBlcyBsYSBkaXN0YW5jaWEgaG9yaXpvbnRhbCBlbnRyZSBlbGxvcz8iLCJvIjpbIjcga20iLCIyNSBrbSIsIjUga20iLCIxIGttIl0sImMiOjIsImQiOiJNZWRpbyIsInIiOiLOlFggPSAzLjAwMCBtOyDOlFkgPSA0LjAwMCBtLiBEaXN0YW5jaWEgPSDiiJooMy4wMDDCsiArIDQuMDAwwrIpID0gNS4wMDAgbSA9IDUga20uIn0seyJxIjoiQ29uIGxvcyBtaXNtb3MgcHVudG9zIGRlIGxhIHByZWd1bnRhIGFudGVyaW9yICjOlFggPSArMy4wMDAgbTsgzpRZID0gKzQuMDAwIG0pLCDCv2N1w6FsIGVzIGVsIGFjaW11dCBhcHJveGltYWRvIGRlIEEgaGFjaWEgQiwgbWVkaWRvIGRlc2RlIGVsIG5vcnRlIGVuIHNlbnRpZG8gaG9yYXJpbz8iLCJvIjpbIjUzLDEzwrAiLCIzNiw4N8KwIiwiMTQzLDEzwrAiLCIyMTYsODfCsCJdLCJjIjoxLCJkIjoiQWx0byIsInIiOiJBY2ltdXQgPSBhcmN0YW4ozpRYIC8gzpRZKSA9IGFyY3RhbigzLjAwMCAvIDQuMDAwKSA9IGFyY3RhbigwLDc1KSDiiYggMzYsODfCsC4gQ29tbyDOlFggeSDOlFkgc29uIHBvc2l0aXZvcywgZXN0w6EgZW4gZWwgcHJpbWVyIGN1YWRyYW50ZSAoTkUpLiJ9LHsicSI6IkRlc2RlIHVuYSB0b3JyZSBkZSB2aWdpbGFuY2lhIHNlIG9ic2VydmEgdW5hIGNvbHVtbmEgZGUgaHVtbyBjb24gYWNpbXV0IDcwwrAuIMK/UXXDqSBhY2ltdXQgdGVuZHLDrWEgbGEgdG9ycmUgdmlzdGEgZGVzZGUgZWwgaHVtbyAoY29udHJhYWNpbXV0KT8iLCJvIjpbIjExMMKwIiwiMjkwwrAiLCIxNjDCsCIsIjI1MMKwIl0sImMiOjMsImQiOiJNZWRpbyIsInIiOiJDb250cmFhY2ltdXQgPSBhY2ltdXQgwrEgMTgwwrAuIENvbW8gNzDCsCA8IDE4MMKwLCBzZSBzdW1hOiA3MMKwICsgMTgwwrAgPSAyNTDCsC4ifSx7InEiOiLCv0N1w6FsIGRlIGxhcyBzaWd1aWVudGVzIGVzY2FsYXMgZXMgbGEgZGUgbWF5b3IgZXNjYWxhLCBlcyBkZWNpciwgbGEgcXVlIHJlcHJlc2VudGEgZWwgdGVycmVubyBjb24gbcOhcyBkZXRhbGxlPyIsIm8iOlsiMToyNS4wMDAiLCIxOjIwMC4wMDAiLCIxOjUuMDAwIiwiMTo1MC4wMDAiXSwiYyI6MiwiZCI6IkbDoWNpbCIsInIiOiJDdWFudG8gbWVub3IgZXMgZWwgZGVub21pbmFkb3IsIG1heW9yIGVzIGxhIGVzY2FsYSB5IG3DoXMgZGV0YWxsZSBtdWVzdHJhLiAxOjUuMDAwIGVzIGxhIG1heW9yLiJ9LHsicSI6IlVuYSBzdXBlcmZpY2llIGRlIDAsMzUga23CsiBlcXVpdmFsZSBhOiIsIm8iOlsiMzUgaGEiLCIzLDUgaGEiLCIzNTAgaGEiLCIzLjUwMCBoYSJdLCJjIjowLCJkIjoiRsOhY2lsIiwiciI6IjEga23CsiA9IDEwMCBoYSDihpIgMCwzNSDDlyAxMDAgPSAzNSBoYS4ifSx7InEiOiJFbCBwZXLDrW1ldHJvIGRlIHVuIGluY2VuZGlvIGZvcmVzdGFsIGRpYnVqYWRvIHNvYnJlIHVuIG1hcGEgMToyNS4wMDAgZW5jaWVycmEgdW5hIHN1cGVyZmljaWUgZGUgOCBjbcKyLiDCv0N1w6FsIGVzIGxhIHN1cGVyZmljaWUgcXVlbWFkYSByZWFsPyIsIm8iOlsiNSBoYSIsIjUwIGhhIiwiNTAwIGhhIiwiMjAgaGEiXSwiYyI6MSwiZCI6IkFsdG8iLCJyIjoiOCBjbcKyIMOXIDI1LjAwMMKyID0gOCDDlyA2MjUuMDAwLjAwMCA9IDUuMDAwLjAwMC4wMDAgY23CsiA9IDUwMC4wMDAgbcKyID0gNTAgaGEuIn0seyJxIjoiVW5hIGxhZGVyYSB0aWVuZSB1bmEgaW5jbGluYWNpw7NuIGRlIDMwwrAuIMK/QSBxdcOpIHBlbmRpZW50ZSBlbiBwb3JjZW50YWplIGVxdWl2YWxlIGFwcm94aW1hZGFtZW50ZT8iLCJvIjpbIjMwICUiLCIzMywzICUiLCI1Nyw3ICUiLCI4Niw2ICUiXSwiYyI6MiwiZCI6IkFsdG8iLCJyIjoiUGVuZGllbnRlICglKSA9IHRhbiDOsSDDlyAxMDAgPSB0YW4gMzDCsCDDlyAxMDAg4omIIDAsNTc3IMOXIDEwMCA9IDU3LDcgJS4ifSx7InEiOiJVbiBwdW50byBlc3TDoSBzaXR1YWRvIGVudHJlIGxhcyBjdXJ2YXMgZGUgbml2ZWwgZGUgNjAwIG0geSA2MjAgbSwgYSAzLzQgZGUgbGEgZGlzdGFuY2lhIGVudHJlIGVsbGFzIG1lZGlkYSBkZXNkZSBsYSBjdXJ2YSBkZSA2MDAgbS4gU3Vwb25pZW5kbyBwZW5kaWVudGUgdW5pZm9ybWUsIMK/Y3XDoWwgZXMgc3UgY290YT8iLCJvIjpbIjYxNSBtIiwiNjA1IG0iLCI2MTAgbSIsIjYxOCBtIl0sImMiOjAsImQiOiJNZWRpbyIsInIiOiJJbnRlcnBvbGFjacOzbiBsaW5lYWw6IDYwMCArICgzLzQpIMOXIDIwID0gNjAwICsgMTUgPSA2MTUgbS4ifSx7InEiOiJVbiBwbGFubyBhIGVzY2FsYSAxOjEwLjAwMCBzZSByZWR1Y2UgZW4gZm90b2NvcGlhIGFsIDUwICUgZGUgc3UgdGFtYcOxby4gwr9DdcOhbCBlcyBsYSBlc2NhbGEgZGVsIHBsYW5vIHJlc3VsdGFudGU/IiwibyI6WyIxOjUuMDAwIiwiMToyMC4wMDAiLCIxOjEwLjAwMCIsIjE6MTUuMDAwIl0sImMiOjEsImQiOiJBbHRvIiwiciI6IkFsIHJlZHVjaXIgYSBsYSBtaXRhZCwgMSBjbSBkZWwgcGFwZWwgcGFzYSBhIHJlcHJlc2VudGFyIGVsIGRvYmxlIGRlIHRlcnJlbm86IDE6KDEwLjAwMCDDlyAyKSA9IDE6MjAuMDAwLiBQb3IgZXNvIGNvbnZpZW5lIHVzYXIgZXNjYWxhIGdyw6FmaWNhLCBxdWUgc2UgcmVkdWNlIGp1bnRvIGNvbiBlbCBwbGFuby4ifV0="))));
+const H = 8019193946857058;
+const L = ["a","b","c","d"];
+let cur = 0;
+const ans = new Array(D.length).fill(null);
+
+function render(){
+  if(cur >= D.length){ return showResult(); }
+  const it = D[cur], a = ans[cur];
+  let h = `<div class="meta"><span>Pregunta ${cur+1} de ${D.length}</span><span class="tag ${it.d}">${it.d}</span></div>
+  <p class="q">${cur+1}. ${it.q}</p>`;
+  it.o.forEach((o,i)=>{
+    let cls = "";
+    if(a!==null){ if(i===it.c) cls="ok"; else if(i===a) cls="ko"; }
+    h += `<button class="opt ${cls}" ${a!==null?"disabled":""} onclick="pick(${i})"><b>${L[i]})</b>${o}</button>`;
+  });
+  h += `<div class="exp ${a!==null?"show":""}"><strong>${a===it.c?"✔ Correcto.":"✘ Incorrecto. Respuesta correcta: "+L[it.c]+")."}</strong><br>${it.r}</div>
+  <div class="nav">
+    <button class="btn sec" onclick="go(-1)" ${cur===0?"disabled":""}>← Anterior</button>
+    <button class="btn" onclick="go(1)" ${a===null?"disabled":""}>${cur===D.length-1?"Ver resultado":"Siguiente →"}</button>
+  </div>`;
+  document.getElementById("card").innerHTML = h;
+  updateBar();
+}
+function pick(i){ if(ans[cur]!==null) return; ans[cur]=i; render(); }
+function go(s){ cur = Math.max(0, cur+s); render(); }
+function jump(i){ cur=i; render(); }
+function updateBar(){
+  const done = ans.filter(x=>x!==null).length;
+  const ok = ans.filter((x,i)=>x===D[i].c).length;
+  document.getElementById("count").textContent = `Respondidas: ${done}/${D.length}`;
+  document.getElementById("score").textContent = `Aciertos: ${ok}`;
+  document.getElementById("prog").style.width = (done/D.length*100)+"%";
+  document.getElementById("dots").innerHTML = D.map((d,i)=>{
+    let c = ans[i]===null?"":(ans[i]===d.c?"ok":"ko");
+    return `<button class="dot ${c} ${i===cur?"cur":""}" onclick="jump(${i})">${i+1}</button>`;
+  }).join("");
+}
+function showResult(){
+  const ok = ans.filter((x,i)=>x===D[i].c).length;
+  const blank = ans.filter(x=>x===null).length;
+  const ko = D.length-ok-blank;
+  const nota = (ok/D.length*10).toFixed(2).replace(".",",");
+  let rows = D.map((d,i)=>{
+    const a = ans[i];
+    const st = a===null?"Sin responder":(a===d.c?"✔":"✘ ("+L[a]+")");
+    return `<tr><td>${i+1}</td><td>${L[d.c]}</td><td>${st}</td><td>${d.d}</td></tr>`;
+  }).join("");
+  document.getElementById("card").innerHTML = `<div class="result">
+    <h2 style="margin:0">Resultado final</h2>
+    <div class="big">${ok} / ${D.length}</div>
+    <p>Nota sobre 10: <strong>${nota}</strong> · Fallos: ${ko} · En blanco: ${blank}</p>
+    <div class="nav" style="justify-content:center">
+      <button class="btn sec" onclick="jump(0)">Revisar preguntas</button>
+      <button class="btn" onclick="restart()">Repetir test</button>
+    </div>
+    <table><tr><th>Nº</th><th>Correcta</th><th>Tu respuesta</th><th>Nivel</th></tr>${rows}</table>
+  </div>`;
+  updateBar();
+}
+function restart(){ ans.fill(null); cur=0; render(); }
+
+/* ---- Acceso protegido ---- */
+function cyrb53(s,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<s.length;i++){ch=s.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+function openModal(){ document.getElementById("modal").classList.add("show"); document.getElementById("err").textContent=""; const p=document.getElementById("pwd"); p.value=""; setTimeout(()=>p.focus(),50); }
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+document.getElementById("pwd").addEventListener("keydown",e=>{ if(e.key==="Enter") checkPwd(); if(e.key==="Escape") closeModal(); });
+function checkPwd(){
+  if(cyrb53(document.getElementById("pwd").value) === H){ closeModal(); buildDoc(); }
+  else document.getElementById("err").textContent = "Contraseña incorrecta.";
+}
+function buildDoc(){
+  let h = `<h2>TEST DE EVALUACIÓN – TOPOGRAFÍA Y CÁLCULO CARTOGRÁFICO</h2>`;
+  D.forEach((d,i)=>{
+    h += `<div class="pq"><p class="en">${i+1}. ${d.q}</p>` + d.o.map((o,j)=>`<p>${L[j]}) ${o}</p>`).join("") + `</div>`;
+  });
+  h += `<h3 style="page-break-before:always">RESPUESTAS CORRECTAS</h3>`;
+  D.forEach((d,i)=>{ h += `<p class="ans"><b>${i+1}-${L[d.c]}</b>. ${d.r}</p>`; });
+  document.getElementById("doc").innerHTML = h;
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("printView").style.display="block";
+  window.scrollTo(0,0);
+}
+function closePrint(){
+  document.getElementById("doc").innerHTML="";
+  document.getElementById("printView").style.display="none";
+  document.getElementById("quiz").style.display="block";
+}
+function copyDoc(){
+  const el = document.getElementById("doc");
+  const html = `<div style="font-family:Arial;font-size:11pt">${el.innerHTML.replace(/<p/g,'<p style="font-family:Arial;font-size:11pt;margin:0"').replace(/<h(\d)/g,'<h$1 style="font-family:Arial;font-size:11pt"')}</div>`;
+  const msg = document.getElementById("copied");
+  if(navigator.clipboard && window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([el.innerText],{type:"text/plain"})})])
+      .then(()=>msg.textContent="Copiado. Pégalo en Word.")
+      .catch(fallback);
+  } else fallback();
+  function fallback(){
+    const r=document.createRange(); r.selectNodeContents(el);
+    const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+    document.execCommand("copy"); s.removeAllRanges();
+    msg.textContent="Copiado. Pégalo en Word.";
+  }
+}
+render();
+</script>
+</body>
+</html>
